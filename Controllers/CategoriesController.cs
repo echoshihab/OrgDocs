@@ -20,9 +20,16 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Categories.ToListAsync());
+            var categories = from category in _context.Categories select category;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                categories = categories.Where(c => c.Name.Contains(searchString));
+            }
+
+
+            return View(await categories.ToListAsync());
         }
 
         // GET: Categories/Details/5
