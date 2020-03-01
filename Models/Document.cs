@@ -24,6 +24,8 @@ namespace OrgDocs.Models
         public int DeptId { get; set;}
         [ForeignKey("DeptId")]
         public Dept Dept { get; set; }
+
+        public string PdfUrl { get; set; }
         
 
     }

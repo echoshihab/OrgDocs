@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +15,12 @@ namespace OrgDocs.Controllers
     public class DocumentsController : Controller
     {
         private readonly OrgDocsContext _context;
+        public readonly IWebHostEnvironment _hostEnvironment;
 
-        public DocumentsController(OrgDocsContext context)
+        public DocumentsController(OrgDocsContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: Documents
@@ -61,8 +65,32 @@ namespace OrgDocs.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,LastUpdate,CategoryId,DeptId")] Document document)
         {
+            document.LastUpdate = DateTime.Now;
             if (ModelState.IsValid)
             {
+
+                string webRootPath = _hostEnvironment.WebRootPath;
+                var files = HttpContext.Request.Form.Files;
+
+                if (files.Count > 0)
+                {
+                    string fileName = Guid.NewGuid().ToString();
+                    var uploads = Path.Combine(webRootPath, @"documents\uploads");
+                    var extension = Path.GetExtension(files[0].FileName);
+                    if (extension != ".pdf")  //not processing request if it is not a pdf
+                    {
+                        return View(document);
+                    }
+
+                    using (FileStream fileStreams = new FileStream(Path.Combine(uploads, fileName + extension),
+                        FileMode.Create))
+                    {
+                        files[0].CopyTo(fileStreams);
+                    }
+                    document.PdfUrl = @"\documents\uploads" + fileName + extension;
+                }
+
+
                 _context.Add(document);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -101,7 +129,7 @@ namespace OrgDocs.Controllers
             {
                 return NotFound();
             }
-
+            document.LastUpdate = DateTime.Now;
             if (ModelState.IsValid)
             {
                 try

@@ -25,6 +25,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Dept)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PdfUrl)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -42,6 +45,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Dept.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PdfUrl)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
