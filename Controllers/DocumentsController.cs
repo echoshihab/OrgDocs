@@ -180,7 +180,18 @@ namespace OrgDocs.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            string webRootPath = _hostEnvironment.WebRootPath;
+
             var document = await _context.Documents.FindAsync(id);
+
+            //delete image
+            var pdfPath = Path.Combine(webRootPath, document.PdfUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(pdfPath))
+            {
+                System.IO.File.Delete(pdfPath);
+            }
+            //delete instance
             _context.Documents.Remove(document);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
