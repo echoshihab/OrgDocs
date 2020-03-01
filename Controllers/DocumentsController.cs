@@ -87,7 +87,7 @@ namespace OrgDocs.Controllers
                     {
                         files[0].CopyTo(fileStreams);
                     }
-                    document.PdfUrl = @"\documents\uploads" + fileName + extension;
+                    document.PdfUrl = @"\documents\uploads\" + fileName + extension;
                 }
 
 
