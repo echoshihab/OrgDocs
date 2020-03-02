@@ -123,15 +123,45 @@ namespace OrgDocs.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,LastUpdate,CategoryId,DeptId")] Document document)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,LastUpdate,CategoryId,DeptId,PdfUrl")] Document document)
         {
             if (id != document.Id)
             {
                 return NotFound();
             }
-            document.LastUpdate = DateTime.Now;
+            
+            
             if (ModelState.IsValid)
             {
+                string webRootPath = _hostEnvironment.WebRootPath;
+                var files = HttpContext.Request.Form.Files;
+                
+
+                if (files.Count> 0 ) //a new file has been uploded in edit
+                {
+                    string fileName = Guid.NewGuid().ToString();
+                    var uploads = Path.Combine(webRootPath, @"documents\uploads");
+                    var extension = Path.GetExtension(files[0].FileName);
+                    var pdfPath = Path.Combine(webRootPath, document.PdfUrl.TrimStart('\\'));
+                    if (extension != ".pdf")  //not processing request if it is not a pdf
+                    {
+                        return View(document);
+                    }
+
+                    if(System.IO.File.Exists(pdfPath))
+                    {
+                        System.IO.File.Delete(pdfPath);
+                    }
+
+                    using (FileStream fileStreams = new FileStream(Path.Combine(uploads, fileName + extension),
+                       FileMode.Create))
+                    {
+                        files[0].CopyTo(fileStreams);
+                    }
+                    document.PdfUrl = @"\documents\uploads\" + fileName + extension;
+                    document.LastUpdate = DateTime.Now; //last update only updated if new document is uploaded
+                }   
+
                 try
                 {
                     _context.Update(document);
