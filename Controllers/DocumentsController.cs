@@ -24,10 +24,15 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var orgDocsContext = _context.Documents.Include(d => d.Category).Include(d => d.Dept);
-            return View(await orgDocsContext.ToListAsync());
+            var documents = from document in _context.Documents.Include(d => d.Category).Include(d => d.Dept) select document;
+     
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                documents = documents.Where(document => document.Title.Contains(searchString));
+            }
+            return View(await documents.ToListAsync());
         }
 
         // GET: Documents/Details/5
