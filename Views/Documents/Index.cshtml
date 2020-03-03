@@ -1,4 +1,4 @@
-﻿@model IEnumerable<OrgDocs.Models.Document>
+﻿@model OrgDocs.Models.DocFiltersVM
 
 @{
     ViewData["Title"] = "Index";
@@ -13,33 +13,46 @@
 
 <form asp-controller="Documents" asp-action="Index" method="get">
     <p>
-        Filter by Title: <input type="text" name="SearchString" />
+        Filters:
+        <select name="docCategory" asp-items="Model.Categories" onchange="onFormSelected(this.value)">
+            <option value="">All Categories</option>
+        </select>
+
+        <select name="docDept" asp-items="Model.Depts" onchange="onFormSelected(this.value)">
+            <option value="">All Depts</option>
+        </select>
+
+
+        <input placeholder="Title" type="text" name="SearchString" />
         <input type="submit" value="Filter" />
+
+
+
     </p>
 </form>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.Documents[0].Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastUpdate)
+                @Html.DisplayNameFor(model => model.Documents[0].LastUpdate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.Documents[0].Category)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Dept)
+                @Html.DisplayNameFor(model => model.Documents[0].Dept)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PdfUrl)
+                @Html.DisplayNameFor(model => model.Documents[0].PdfUrl)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Documents) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)

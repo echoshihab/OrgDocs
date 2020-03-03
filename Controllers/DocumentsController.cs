@@ -24,15 +24,39 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string docCategory, string docDept, string searchString)
         {
+            //get list of Categories
+            IQueryable<string> catQuery = from category in _context.Categories orderby category.Name select category.Name;
+
+
+            //get list of depts
+            IQueryable<string> deptQuery = from dept in _context.Depts orderby dept.Department select dept.Department;
+
+            //get documents
             var documents = from document in _context.Documents.Include(d => d.Category).Include(d => d.Dept) select document;
      
             if (!String.IsNullOrEmpty(searchString))
             {
                 documents = documents.Where(document => document.Title.Contains(searchString));
             }
-            return View(await documents.ToListAsync());
+            if (!String.IsNullOrEmpty(docCategory))
+            {
+                documents = documents.Where(document => document.Category.Name == docCategory);
+            }
+            if (!String.IsNullOrEmpty(docDept))
+            {
+                documents = documents.Where(document => document.Dept.Department == docDept);
+            }
+
+            var docFiltersVM = new DocFiltersVM
+            {
+                Categories = new SelectList(await catQuery.ToListAsync()),
+                Depts = new SelectList(await deptQuery.ToListAsync()),
+                Documents = await documents.ToListAsync(),
+
+            };
+            return View(docFiltersVM);
         }
 
         // GET: Documents/Details/5
