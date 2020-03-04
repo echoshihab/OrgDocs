@@ -24,8 +24,10 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents
-        public async Task<IActionResult> Index(string docCategory, string docDept, string searchString)
+        public async Task<IActionResult> Index(string sortOrder, string docCategory, string docDept, string searchString)
         {
+
+           
             //get list of Categories
             IQueryable<string> catQuery = from category in _context.Categories orderby category.Name select category.Name;
 
@@ -35,7 +37,11 @@ namespace OrgDocs.Controllers
 
             //get documents
             var documents = from document in _context.Documents.Include(d => d.Category).Include(d => d.Dept) select document;
-     
+
+         
+
+
+
             if (!String.IsNullOrEmpty(searchString))
             {
                 documents = documents.Where(document => document.Title.Contains(searchString));
@@ -48,6 +54,23 @@ namespace OrgDocs.Controllers
             {
                 documents = documents.Where(document => document.Dept.Department == docDept);
             }
+
+            //sort logic
+
+            ViewData["TitleSortParam"] = String.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
+
+            switch (sortOrder)
+            {
+                case "title_desc":
+                    documents = documents.OrderByDescending(d => d.Title);
+                    break;
+                default:
+                    documents = documents.OrderBy(d => d.Title);
+                    break;
+            }
+
+
+            //pagination logic
 
             var docFiltersVM = new DocFiltersVM
             {

@@ -14,15 +14,15 @@
 <form asp-controller="Documents" asp-action="Index" method="get">
     <p>
         Filters:
-        <select name="docCategory" asp-items="Model.Categories" onchange="onFormSelected(this.value)">
+        <select name="docCategory" asp-items="Model.Categories">
             <option value="">All Categories</option>
         </select>
 
-        <select name="docDept" asp-items="Model.Depts" onchange="onFormSelected(this.value)">
+        <select name="docDept" asp-items="Model.Depts">
             <option value="">All Depts</option>
         </select>
 
-
+      
         <input placeholder="Title" type="text" name="SearchString" />
         <input type="submit" value="Filter" />
 
@@ -34,7 +34,12 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Documents[0].Title)
+                
+               <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParam"]"
+                 
+                  >
+                   @Html.DisplayNameFor(model => model.Documents[0].Title)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Documents[0].LastUpdate)
