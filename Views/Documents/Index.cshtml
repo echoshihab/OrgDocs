@@ -24,6 +24,7 @@
 
       
         <input placeholder="Title" type="text" name="SearchString" />
+
         <input type="submit" value="Filter" />
 
 
@@ -36,13 +37,16 @@
             <th>
                 
                <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParam"]"
-                 
+                  asp-route-currentFilter="@ViewData["CurrentFilter"]"
                   >
-                   @Html.DisplayNameFor(model => model.Documents[0].Title)
+                   Title
                 </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Documents[0].LastUpdate)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["LastUpdateSortParam"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                    Last Update
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Documents[0].Category)
@@ -83,3 +87,25 @@
 }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.Documents.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Documents.HasNextPage ? "disabled" : "";
+
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.Documents.PageIndex -1)"
+   asp-route-currentFilter ="@ViewData["CurentFilter"]"
+   class="btn btn-default @prevDisabled">
+   Previous
+</a>
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.Documents.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

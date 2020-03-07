@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OrgDocs.Data;
 using OrgDocs.Models;
+using OrgDocs.Utility;
 
 namespace OrgDocs.Controllers
 {
@@ -24,10 +25,28 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents
-        public async Task<IActionResult> Index(string sortOrder, string docCategory, string docDept, string searchString)
+        public async Task<IActionResult> Index(
+            string sortOrder, 
+            string currentFilter, 
+            string searchString,
+            int? pageNumber)
         {
 
-           
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["TitleSortParam"] = String.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
+            ViewData["LastUpdateSortParam"] = sortOrder == "LastUpdate" ? "last_update_desc" : "LastUpdate";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
             //get list of Categories
             IQueryable<string> catQuery = from category in _context.Categories orderby category.Name select category.Name;
 
@@ -44,25 +63,25 @@ namespace OrgDocs.Controllers
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                documents = documents.Where(document => document.Title.Contains(searchString));
+                documents = documents.Where(document => document.Title.Contains(searchString) || document.Dept.Department.Contains(searchString)
+                || document.Category.Name.Contains(searchString));
             }
-            if (!String.IsNullOrEmpty(docCategory))
-            {
-                documents = documents.Where(document => document.Category.Name == docCategory);
-            }
-            if (!String.IsNullOrEmpty(docDept))
-            {
-                documents = documents.Where(document => document.Dept.Department == docDept);
-            }
+
 
             //sort logic
 
-            ViewData["TitleSortParam"] = String.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
+            
 
             switch (sortOrder)
             {
                 case "title_desc":
                     documents = documents.OrderByDescending(d => d.Title);
+                    break;
+                case "LastUpdate":
+                    documents = documents.OrderBy(d => d.LastUpdate);
+                    break;
+                case "last_update_desc":
+                    documents = documents.OrderByDescending(d => d.LastUpdate);
                     break;
                 default:
                     documents = documents.OrderBy(d => d.Title);
@@ -71,14 +90,15 @@ namespace OrgDocs.Controllers
 
 
             //pagination logic
-
+            int pageSize = 3;
             var docFiltersVM = new DocFiltersVM
             {
                 Categories = new SelectList(await catQuery.ToListAsync()),
                 Depts = new SelectList(await deptQuery.ToListAsync()),
-                Documents = await documents.ToListAsync(),
+                Documents = await PaginatedList<Document>.CreateAsync(documents.AsNoTracking(), pageNumber ?? 1, pageSize),
 
             };
+           
             return View(docFiltersVM);
         }
 
