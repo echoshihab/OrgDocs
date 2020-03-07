@@ -102,13 +102,14 @@ namespace OrgDocs.Controllers
                     break;
             }
 
+            
 
             //pagination logic
             int pageSize = 3;
             var docFiltersVM = new DocFiltersVM
             {
-                Categories = new SelectList(await catQuery.ToListAsync()),
-                Depts = new SelectList(await deptQuery.ToListAsync()),
+                Categories = new SelectList(await catQuery.ToListAsync(), catFilter),
+                Depts = new SelectList(await deptQuery.ToListAsync(), deptFilter),
                 Documents = await PaginatedList<Document>.CreateAsync(documents.AsNoTracking(), pageNumber ?? 1, pageSize),
 
             };
