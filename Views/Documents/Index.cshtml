@@ -14,15 +14,15 @@
 <form asp-controller="Documents" asp-action="Index" method="get">
     <p>
         Filters:
-        <select name="docCategory" asp-items="Model.Categories">
+        <select name="catFilter" asp-items="Model.Categories">
             <option value="">All Categories</option>
         </select>
 
-        <select name="docDept" asp-items="Model.Depts">
+        <select name="deptFilter" asp-items="Model.Depts">
             <option value="">All Depts</option>
         </select>
 
-      
+
         <input placeholder="Title" type="text" name="SearchString" />
 
         <input type="submit" value="Filter" />
@@ -35,16 +35,19 @@
     <thead>
         <tr>
             <th>
-                
-               <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParam"]"
-                  asp-route-currentFilter="@ViewData["CurrentFilter"]"
-                  >
-                   Title
+
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSortParam"]"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-deptFilter="@ViewData["DeptFilter"]"
+                   asp-route-catFilter="@ViewData["CatFilter"]">
+                    Title
                 </a>
             </th>
             <th>
                 <a asp-action="Index" asp-route-sortOrder="@ViewData["LastUpdateSortParam"]"
-                   asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-deptFilter="@ViewData["DeptFilter"]"
+                   asp-route-catFilter="@ViewData["CatFilter"]">
                     Last Update
                 </a>
             </th>
@@ -61,30 +64,31 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Documents) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastUpdate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Dept.Department)
-            </td>
-            <td>
-               <a target="_blank" href="@Html.DisplayFor(modelItem => item.PdfUrl)">View Document</a>
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Documents)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastUpdate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dept.Department)
+                </td>
+                <td>
+                    <a target="_blank" href="@Html.DisplayFor(modelItem => item.PdfUrl)">View Document</a>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
@@ -97,15 +101,19 @@
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-pageNumber="@(Model.Documents.PageIndex -1)"
-   asp-route-currentFilter ="@ViewData["CurentFilter"]"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-deptFilter="@ViewData["DeptFilter"]"
+   asp-route-catFilter="@ViewData["CatFilter"]"
    class="btn btn-default @prevDisabled">
-   Previous
+    Previous
 </a>
 
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-pageNumber="@(Model.Documents.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurentFilter"]"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-deptFilter="@ViewData["DeptFilter"]"
+   asp-route-catFilter="@ViewData["CatFilter"]"
    class="btn btn-default @nextDisabled">
     Next
 </a>

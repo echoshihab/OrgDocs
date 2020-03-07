@@ -26,8 +26,10 @@ namespace OrgDocs.Controllers
 
         // GET: Documents
         public async Task<IActionResult> Index(
-            string sortOrder, 
-            string currentFilter, 
+            string sortOrder,
+            string currentFilter,
+            string catFilter,
+            string deptFilter,
             string searchString,
             int? pageNumber)
         {
@@ -46,6 +48,8 @@ namespace OrgDocs.Controllers
             }
 
             ViewData["CurrentFilter"] = searchString;
+            ViewData["DeptFilter"] = deptFilter;
+            ViewData["CatFilter"] = catFilter;
 
             //get list of Categories
             IQueryable<string> catQuery = from category in _context.Categories orderby category.Name select category.Name;
@@ -57,20 +61,30 @@ namespace OrgDocs.Controllers
             //get documents
             var documents = from document in _context.Documents.Include(d => d.Category).Include(d => d.Dept) select document;
 
-         
 
 
+            //filter logic
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                documents = documents.Where(document => document.Title.Contains(searchString) || document.Dept.Department.Contains(searchString)
-                || document.Category.Name.Contains(searchString));
+                documents = documents.Where(document => document.Title.Contains(searchString));
+
+            }
+
+            if (!String.IsNullOrEmpty(catFilter))
+            {
+                documents = documents.Where(document => document.Category.Name.Contains(catFilter));
+            }
+
+            if (!String.IsNullOrEmpty(deptFilter))
+            {
+                documents = documents.Where(document => document.Dept.Department.Contains(deptFilter));
             }
 
 
-            //sort logic
 
-            
+
+            //sort logic
 
             switch (sortOrder)
             {
@@ -98,7 +112,7 @@ namespace OrgDocs.Controllers
                 Documents = await PaginatedList<Document>.CreateAsync(documents.AsNoTracking(), pageNumber ?? 1, pageSize),
 
             };
-           
+
             return View(docFiltersVM);
         }
 
@@ -201,15 +215,15 @@ namespace OrgDocs.Controllers
             {
                 return NotFound();
             }
-            
-            
+
+
             if (ModelState.IsValid)
             {
                 string webRootPath = _hostEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
-                
 
-                if (files.Count> 0 ) //a new file has been uploded in edit
+
+                if (files.Count > 0) //a new file has been uploded in edit
                 {
                     string fileName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(webRootPath, @"documents\uploads");
@@ -220,7 +234,7 @@ namespace OrgDocs.Controllers
                         return View(document);
                     }
 
-                    if(System.IO.File.Exists(pdfPath))
+                    if (System.IO.File.Exists(pdfPath))
                     {
                         System.IO.File.Delete(pdfPath);
                     }
@@ -232,7 +246,7 @@ namespace OrgDocs.Controllers
                     }
                     document.PdfUrl = @"\documents\uploads\" + fileName + extension;
                     document.LastUpdate = DateTime.Now; //last update only updated if new document is uploaded
-                }   
+                }
 
                 try
                 {
