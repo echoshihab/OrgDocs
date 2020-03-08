@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OrgDocs.Data;
+using OrgDocs.Utility;
 
 namespace OrgDocs
 {
@@ -25,11 +28,22 @@ namespace OrgDocs
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            
 
             services.AddDbContext<OrgDocsContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("OrgDocsContextConnection")));
-        
+            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders().AddEntityFrameworkStores<OrgDocsContext>();
+            services.AddSingleton<IEmailSender, EmailSender>();
+
+            services.Configure<EmailOptions>(option =>
+            {
+                option.SendGridKey = Environment.GetEnvironmentVariable("sendgridKey", EnvironmentVariableTarget.User);
+                option.SendGridUser = Environment.GetEnvironmentVariable("sendgridUser", EnvironmentVariableTarget.User);
+            });
+
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+
         }
 
 
@@ -51,6 +65,7 @@ namespace OrgDocs
 
             app.UseRouting();
 
+       
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -58,6 +73,7 @@ namespace OrgDocs
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages(); //new
             });
         }
     }
