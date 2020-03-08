@@ -20,6 +20,7 @@ namespace OrgDocs.Controllers
 
         public IActionResult Index()
         {
+
             return View();
         }
 

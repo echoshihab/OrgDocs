@@ -67,6 +67,7 @@ namespace OrgDocs
 
        
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
