@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using OrgDocs.Models;
+using OrgDocs.Utility;
 
 namespace OrgDocs.Areas.Identity.Pages.Account
 {
@@ -23,17 +25,20 @@ namespace OrgDocs.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -80,11 +85,33 @@ namespace OrgDocs.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.UserName, Email = Input.Email };
+                var user = new ApplicationUser 
+                { UserName = Input.UserName, 
+                    Email = Input.Email,
+                    Role = SD.Role_Pending
+                   };
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    //check if role exists, if not create it
+                    if(!await _roleManager.RoleExistsAsync(SD.Role_Pending))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_Pending));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(SD.Role_Admin))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(SD.Role_Employee))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee));
+                    }
+
+                    //add to role
+                    await _userManager.AddToRoleAsync(user, user.Role);
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

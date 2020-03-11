@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace OrgDocs.Data
 {
-    public class OrgDocsContext : IdentityDbContext<IdentityUser>
+    public class OrgDocsContext : IdentityDbContext
     {
         public OrgDocsContext(DbContextOptions<OrgDocsContext> options)
             : base(options)

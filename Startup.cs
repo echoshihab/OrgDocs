@@ -32,7 +32,7 @@ namespace OrgDocs
 
             services.AddDbContext<OrgDocsContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("OrgDocsContextConnection")));
-            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders().AddEntityFrameworkStores<OrgDocsContext>();
+            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<OrgDocsContext>().AddDefaultTokenProviders();
             services.AddSingleton<IEmailSender, EmailSender>();
 
             services.Configure<EmailOptions>(option =>
