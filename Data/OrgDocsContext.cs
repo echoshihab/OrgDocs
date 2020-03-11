@@ -15,6 +15,7 @@ namespace OrgDocs.Data
         public DbSet<Dept> Depts { get; set; }
         public DbSet<Document> Documents { get; set; }
     
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     
     }
 
