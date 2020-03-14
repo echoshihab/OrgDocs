@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OrgDocs.Data;
 using OrgDocs.Models;
+using OrgDocs.Utility;
 
 namespace OrgDocs.Controllers
 {
@@ -22,6 +24,7 @@ namespace OrgDocs.Controllers
         }
 
         // GET: User
+        [Authorize(Roles = SD.Role_Admin)]
         public  IActionResult Index()
         {
             var userList = _context.ApplicationUsers.ToList();
@@ -45,6 +48,7 @@ namespace OrgDocs.Controllers
         }
 
         //GET: User/Details/5
+        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -72,6 +76,7 @@ namespace OrgDocs.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ActionName("Details")]
+        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> DetailsPost(string role, string id)
         {
 

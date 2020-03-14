@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using OrgDocs.Utility
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -23,9 +25,21 @@
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                    @if (User.IsInRole(SD.Role_Admin))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropDown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin Menu
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-controller="Categories" asp-action="Index">Category</a>
+                                <a class="dropdown-item" asp-controller="Depts" asp-action="Index">Departments</a>
+                                <a class="dropdown-item" asp-controller="User" asp-action="Index">Users</a>
+                            </div>
                         </li>
+
+                    }
                     </ul>
                 </div>
             </div>
