@@ -1,25 +1,45 @@
-﻿@model OrgDocs.Models.Category
+﻿@model OrgDocs.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "User Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Details</h1>
 
 <div>
-    <h4>Category</h4>
+    <h4>@Model.UserName</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserName)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt class="col-sm-2">
+            <label asp-for="Role" class="control-label"></label>
+        </dt>
+        <dd class="col-sm-10">
+            <form asp-action="Details">
+                <div class="form-group">
+
+                    <select name="Role" asp-items="ViewBag.UserRoles">
+                    </select>
+                    <input type="hidden" asp-for="Id" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,11 @@ namespace OrgDocs.Controllers
     public class UserController : Controller
     {
         private readonly OrgDocsContext _context;
-
-        public UserController(OrgDocsContext context)
+        private readonly UserManager<IdentityUser> _userManager;
+        public UserController(OrgDocsContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: User
@@ -31,6 +33,7 @@ namespace OrgDocs.Controllers
                 var roleId = userRoles.FirstOrDefault(u => u.UserId == user.Id).RoleId;
                 user.Role = roles.FirstOrDefault(u => u.Id == roleId).Name;
 
+  
                 if(user.Role == null)
                 {
                     user.Role = "Not Defined";
@@ -41,78 +44,72 @@ namespace OrgDocs.Controllers
             
         }
 
-        // GET: User/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        //GET: User/Details/5
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var user = await _context.User
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var user = await _context.ApplicationUsers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(user);
-        //}
+            var userRoles = _context.UserRoles.ToList();
+            var roles = _context.Roles.ToList();
+            var roleId = userRoles.FirstOrDefault(u => u.UserId == user.Id).RoleId;
+            user.Role = roles.FirstOrDefault(u => u.Id == roleId).Name;
+            ViewData["UserRoles"] = new SelectList(roles, "Name", "Name", user.Role);
 
-     
+            return View(user);
+        }
 
-        // GET: User/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
 
-        //    var user = await _context.User.FindAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(user);
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Details")]
+        public async Task<IActionResult> DetailsPost(string role, string id)
+        {
 
-        // POST: User/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category user)
-        //{
-        //    if (id != user.Id)
-        //    {
-        //        return NotFound();
-        //    }
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(user);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!CategoryExists(user.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(user);
-        //}
+            var user = await _context.ApplicationUsers
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-       
+
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var currentRoleID = _context.UserRoles.FirstOrDefault(u => u.UserId == id).RoleId;
+            var currentRole = _context.Roles.FirstOrDefault(r => r.Id == currentRoleID).Name;
+
+            var newRole = _context.Roles.FirstOrDefault(r => r.Name == role).Name;
+
+            if (newRole == null)
+            {
+                return NotFound();
+            }
+
+            await _userManager.RemoveFromRoleAsync(user, currentRole);
+            await _userManager.AddToRoleAsync(user, newRole);
+           
+
+            return RedirectToAction(nameof(Index));
+
+
+        }
+
+
         private bool UserExists(string id)
         {
             return _context.ApplicationUsers.Any(e => e.Id == id);
