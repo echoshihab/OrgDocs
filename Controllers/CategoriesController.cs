@@ -12,6 +12,7 @@ using OrgDocs.Utility;
 
 namespace OrgDocs.Controllers
 {
+    [Authorize(Roles = SD.Role_Admin)]
     public class CategoriesController : Controller
     {
         private readonly OrgDocsContext _context;
@@ -36,7 +37,7 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Categories/Details/5
-        [Authorize(Roles = SD.Role_Admin)]
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -55,7 +56,6 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Categories/Create
-        [Authorize(Roles = SD.Role_Admin)]
         public IActionResult Create()
         {
             return View();
@@ -66,7 +66,6 @@ namespace OrgDocs.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
             if (ModelState.IsValid)
@@ -79,7 +78,6 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Categories/Edit/5
-        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -100,7 +98,6 @@ namespace OrgDocs.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
         {
             if (id != category.Id)
@@ -132,7 +129,6 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Categories/Delete/5
-        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -153,7 +149,6 @@ namespace OrgDocs.Controllers
         // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
