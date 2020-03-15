@@ -5,31 +5,35 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Documentations</h1>
+<h4 class="text-center">Documentations</h4>
 
-<p>
-    <a asp-action="Create">Create New</a>
+<p class="text-right">
+    <a class="btn btn-outline-light" asp-action="Create">Add New Document</a>
 </p>
 
-<form asp-controller="Documents" asp-action="Index" method="get">
+<form asp-controller="Documents" asp-action="Index" method="get" class="form-group">
     <p>
-        Filters:
-        <select name="catFilter"  asp-items="Model.Categories">
-            <option value="">All Categories</option>
-        </select>
+        <div class="row">
+            <div class="col">
+                <select class="form-control" name="catFilter" asp-items="Model.Categories">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="col">
+                <select class="form-control" name="deptFilter" asp-items="Model.Depts">
+                    <option value="">All Depts</option>
+                </select>
+            </div>
+            <div class="col">
+                <input class="form-control" placeholder="Title" type="text" value="@ViewData["CurrentFilter"]" name="SearchString" />
+            </div>
+            <div class="col">
+                <input class="btn btn-primary" type="submit" value="Filter" />
+            </div>
+        </div>
 
-        <select name="deptFilter" asp-items="Model.Depts">
-            <option value="">All Depts</option>
-        </select>
 
-
-        <input placeholder="Title" type="text" value="@ViewData["CurrentFilter"]" name="SearchString" />
-
-        <input type="submit" value="Filter" />
-
-
-
-    </p>
+</p>
 </form>
 <table class="table">
     <thead>
@@ -83,9 +87,19 @@
                     <a target="_blank" href="@Html.DisplayFor(modelItem => item.PdfUrl)">View Document</a>
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <div class="row">
+                        <div class="col">
+                            <a asp-action="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
+                        </div>
+                        <div class="col">
+                            <a asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info"></i></a>
+                        </div>
+                        <div class="col">
+                            <a asp-action="Delete" asp-route-id="@item.Id"><i class="far fa-trash-alt"></i></a>
+                        </div>
+                    </div>
+                
+
                 </td>
             </tr>
         }

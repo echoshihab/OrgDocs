@@ -5,9 +5,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<h4>Edit Document</h4>
 
-<h4>Document</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -30,7 +29,7 @@
                 <span asp-validation-for="DeptId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label"> Upload Document (PDF only)</label>
+                <label class="control-label"> Upload New Document (PDF only)</label>
                 <input type="file" name="files" id="uploadBox" multiple class="form-control" />
                 <input type="hidden" asp-for="PdfUrl" />
                 <span asp-validation-for="PdfUrl" class="text-danger"></span>
@@ -43,7 +42,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index"><i style="font-size:1.5em" class="far fa-arrow-alt-circle-left"></i></a>
 </div>
 
 @section Scripts {

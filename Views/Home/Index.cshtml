@@ -3,6 +3,11 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h2 class="display-4">Welcome to OrgDocs</h2>
+    <p>Click <a asp-controller="Documents" asp-action="Index">Here</a> to start browsing documents</p>
+    @if (!User.Identity.IsAuthenticated)
+    {
+    <p>New User? <a id="register" asp-area="Identity" asp-page="/Account/Register">Register</a> and subscribe to document updates</p>
+    <p>Existing User? <a id="login" asp-area="Identity" asp-page="/Account/Login">Login</a></p>
+    }
 </div>

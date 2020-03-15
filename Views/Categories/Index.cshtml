@@ -5,39 +5,57 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h4 class="text-center">Categories</h4>
 
-<p>
-    <a asp-action="Create">Create New</a>
+<p class="text-right">
+    <a class="btn btn-outline-light" asp-action="Create">Create New Category</a>
 </p>
-<form asp-controller="Categories" asp-action="Index" method="get">
-    <p>
-        Filter by Name: <input type="text" name="SearchString" />
-        <input type="submit" value="Filter" />
-    </p>
-</form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<div class="container">
+    <form asp-controller="Categories" asp-action="Index" method="get">
+        <div class="row">
+            <div class="col">
+                <input class="form-control py-sm-2" type="text" name="SearchString" placeholder="filter category.." />
+            </div>
+            <div class="col">
+                <input class="btn btn-primary" type="submit" value="Filter" />
+            </div>
+        </div>
+    </form>
+    <table class="table table-sm sm">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col m-0 p-0">
+                                <a asp-action="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
+                            </div>
+                            <div class="col m-0 p-0">
+                                <a asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info"></i></a>
+                            </div>
+                            <div class="col m-0 p-0">
+                                <a asp-action="Delete" asp-route-id="@item.Id"><i class="far fa-trash-alt"></i></a>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

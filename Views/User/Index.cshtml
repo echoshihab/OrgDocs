@@ -5,14 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>User List</h1>
+<h4 class="text-center">User List</h4>
 
 
-<table class="table">
+<table class="table table-sm">
     <thead>
         <tr>
             <th>
-                User Name
+                Username
             </th>
             <th>
                 Email
@@ -38,7 +38,7 @@
                 @Html.DisplayFor(modelItem => item.Role)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Update</a> 
+                <a asp-action="Details" asp-route-id="@item.Id"><i class="far fa-edit"></i></a> 
             </td>
         </tr>
 }
