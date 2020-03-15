@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OrgDocs.Data;
 
 namespace OrgDocs.Migrations
 {
     [DbContext(typeof(OrgDocsContext))]
-    partial class OrgDocsContextModelSnapshot : ModelSnapshot
+    [Migration("20200315201933_AddSubscrpion")]
+    partial class AddSubscrpion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

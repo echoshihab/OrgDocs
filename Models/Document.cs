@@ -28,6 +28,6 @@ namespace OrgDocs.Models
         [Display(Name ="Document")]
         public string PdfUrl { get; set; }
         
-
+        public ICollection<Subscription> Subscriptions { get; set; }
     }
 }
