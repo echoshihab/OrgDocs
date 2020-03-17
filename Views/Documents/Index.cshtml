@@ -33,7 +33,7 @@
         </div>
 
 
-</p>
+    </p>
 </form>
 <table class="table">
     <thead>
@@ -97,8 +97,31 @@
                         <div class="col">
                             <a asp-action="Delete" asp-route-id="@item.Id"><i class="far fa-trash-alt"></i></a>
                         </div>
+                        <div class="col">
+
+
+                            @if (item.Subscriptions.Count(item => item.ApplicationUserID == (string)(ViewData["UserID"])) > 0)
+                            {
+
+                                <button class="btn btn-outline-light" asp-action="subscribe">Subscribed</button>
+
+                            }
+                            else
+                            {
+                                foreach (var subscription in item.Subscriptions)
+                                {
+                                    <p>@subscription.ApplicationUserID</p>
+                                }
+                                <form asp-action="Subscribe">
+                                    <input name="documentID" value="@item.Id" hidden />
+                                    <input name="userID" value="@ViewData["UserID"]" hidden />
+                                    <button class="btn btn-sm btn-outline-light" type="submit">Subscribe</button>
+                                </form>
+                            }
+
+                            </div>
                     </div>
-                
+
 
                 </td>
             </tr>

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +19,13 @@ namespace OrgDocs.Controllers
     {
         private readonly OrgDocsContext _context;
         public readonly IWebHostEnvironment _hostEnvironment;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public DocumentsController(OrgDocsContext context, IWebHostEnvironment hostEnvironment)
+        public DocumentsController(OrgDocsContext context, IWebHostEnvironment hostEnvironment, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _hostEnvironment = hostEnvironment;
+            _userManager = userManager;
         }
 
         // GET: Documents
@@ -50,6 +54,7 @@ namespace OrgDocs.Controllers
             ViewData["CurrentFilter"] = searchString;
             ViewData["DeptFilter"] = deptFilter;
             ViewData["CatFilter"] = catFilter;
+            ViewData["UserID"] = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //get list of Categories
             IQueryable<string> catQuery = from category in _context.Categories orderby category.Name select category.Name;
@@ -59,7 +64,11 @@ namespace OrgDocs.Controllers
             IQueryable<string> deptQuery = from dept in _context.Depts orderby dept.Department select dept.Department;
 
             //get documents
-            var documents = from document in _context.Documents.Include(d => d.Category).Include(d => d.Dept) select document;
+            var documents = from document in _context.Documents
+                            .Include(d => d.Category)
+                            .Include(d => d.Dept)
+                            .Include(d=> d.Subscriptions)
+                            select document;
 
 
 
@@ -102,7 +111,7 @@ namespace OrgDocs.Controllers
                     break;
             }
 
-            
+
 
             //pagination logic
             int pageSize = 3;
@@ -110,7 +119,8 @@ namespace OrgDocs.Controllers
             {
                 Categories = new SelectList(await catQuery.ToListAsync(), catFilter),
                 Depts = new SelectList(await deptQuery.ToListAsync(), deptFilter),
-                Documents = await PaginatedList<Document>.CreateAsync(documents.AsNoTracking(), pageNumber ?? 1, pageSize),
+                Documents = await PaginatedList<Document>.CreateAsync(
+                    documents.AsNoTracking(), pageNumber ?? 1, pageSize),
 
             };
 
@@ -310,6 +320,21 @@ namespace OrgDocs.Controllers
             }
             //delete instance
             _context.Documents.Remove(document);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Subscribe(int documentID, string userID)
+        {
+            Subscription subscription = new Subscription
+            {
+                DocumentID = documentID,
+                ApplicationUserID = userID
+            };
+
+            _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
