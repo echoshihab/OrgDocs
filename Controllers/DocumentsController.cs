@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +21,15 @@ namespace OrgDocs.Controllers
         private readonly OrgDocsContext _context;
         public readonly IWebHostEnvironment _hostEnvironment;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public DocumentsController(OrgDocsContext context, IWebHostEnvironment hostEnvironment, UserManager<IdentityUser> userManager)
+        public DocumentsController(OrgDocsContext context, IWebHostEnvironment hostEnvironment, UserManager<IdentityUser> userManager, 
+            IEmailSender emailSender)
         {
             _context = context;
             _hostEnvironment = hostEnvironment;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         // GET: Documents
@@ -227,6 +231,7 @@ namespace OrgDocs.Controllers
                 return NotFound();
             }
 
+           
 
             if (ModelState.IsValid)
             {
@@ -259,10 +264,24 @@ namespace OrgDocs.Controllers
                     document.LastUpdate = DateTime.Now; //last update only updated if new document is uploaded
                 }
 
+
+                
+
+                List<Subscription> listofSubscriptions = _context.Subscriptions.Include(s => s.ApplicationUser).Where(d => d.DocumentID == id).ToList();
+
+              
                 try
                 {
+                    
                     _context.Update(document);
                     await _context.SaveChangesAsync();
+                    //send email update post-document update to subscribed users.
+                    foreach (Subscription sub in listofSubscriptions)
+                    {
+                        await _emailSender.SendEmailAsync(sub.ApplicationUser.Email, "OrgDocs: Subscribed document updated!",
+                            $"This notification is to inform you that the document titled {document.Title} has been updated");
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -275,6 +294,10 @@ namespace OrgDocs.Controllers
                         throw;
                     }
                 }
+
+
+          
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", document.CategoryId);
