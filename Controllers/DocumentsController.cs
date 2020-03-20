@@ -237,10 +237,11 @@ namespace OrgDocs.Controllers
             {
                 string webRootPath = _hostEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
-
+                bool uploadedNewFile = false;
 
                 if (files.Count > 0) //a new file has been uploded in edit
                 {
+                    uploadedNewFile = true;
                     string fileName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(webRootPath, @"documents\uploads");
                     var extension = Path.GetExtension(files[0].FileName);
@@ -267,7 +268,7 @@ namespace OrgDocs.Controllers
 
                 
 
-                List<Subscription> listofSubscriptions = _context.Subscriptions.Include(s => s.ApplicationUser).Where(d => d.DocumentID == id).ToList();
+               
 
               
                 try
@@ -276,11 +277,16 @@ namespace OrgDocs.Controllers
                     _context.Update(document);
                     await _context.SaveChangesAsync();
                     //send email update post-document update to subscribed users.
-                    foreach (Subscription sub in listofSubscriptions)
+                    if (uploadedNewFile)
                     {
-                        await _emailSender.SendEmailAsync(sub.ApplicationUser.Email, "OrgDocs: Subscribed document updated!",
-                            $"This notification is to inform you that the document titled {document.Title} has been updated");
+                        List<Subscription> listofSubscriptions = _context.Subscriptions.Include(s => s.ApplicationUser).Where(d => d.DocumentID == id).ToList();
+                        foreach (Subscription sub in listofSubscriptions)
+                        {
+                            await _emailSender.SendEmailAsync(sub.ApplicationUser.Email, "OrgDocs: Subscribed document updated!",
+                                $"This notification is to inform you that the document titled {document.Title} has been updated");
+                        }
                     }
+
 
                 }
                 catch (DbUpdateConcurrencyException)
