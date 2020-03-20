@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -132,6 +133,7 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -152,6 +154,7 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents/Create
+        [Authorize(Roles = SD.Role_Admin)]
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
@@ -162,6 +165,7 @@ namespace OrgDocs.Controllers
         // POST: Documents/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,LastUpdate,CategoryId,DeptId")] Document document)
@@ -202,6 +206,7 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents/Edit/5
+        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -222,6 +227,7 @@ namespace OrgDocs.Controllers
         // POST: Documents/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,LastUpdate,CategoryId,DeptId,PdfUrl")] Document document)
@@ -312,6 +318,7 @@ namespace OrgDocs.Controllers
         }
 
         // GET: Documents/Delete/5
+        [Authorize(Roles = SD.Role_Admin)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -332,6 +339,7 @@ namespace OrgDocs.Controllers
         }
 
         // POST: Documents/Delete/5
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -353,6 +361,7 @@ namespace OrgDocs.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = SD.Role_Admin + ", "+ SD.Role_Employee)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Subscribe(int documentID, string userID)

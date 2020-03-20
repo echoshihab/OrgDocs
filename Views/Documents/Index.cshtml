@@ -1,15 +1,20 @@
 ﻿@model OrgDocs.Models.DocFiltersVM
+@using OrgDocs.Utility
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <h4 class="text-center">Documentations</h4>
 
+@if (this.User.IsInRole(SD.Role_Admin))
+{
 <p class="text-right">
     <a class="btn btn-outline-light" asp-action="Create">Add New Document</a>
 </p>
+}
 
 <form asp-controller="Documents" asp-action="Index" method="get" class="form-group">
     <p>
@@ -88,35 +93,40 @@
                 </td>
                 <td>
                     <div class="row">
-                        <div class="col">
-                            <a asp-action="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
-                        </div>
-                        <div class="col">
-                            <a asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info"></i></a>
-                        </div>
-                        <div class="col">
-                            <a asp-action="Delete" asp-route-id="@item.Id"><i class="far fa-trash-alt"></i></a>
-                        </div>
-                        <div class="col">
 
 
-                            @if (item.Subscriptions.Count(item => item.ApplicationUserID == (string)(ViewData["UserID"])) > 0)
-                            {
+                        @if (this.User.IsInRole(SD.Role_Admin) || this.User.IsInRole(SD.Role_Employee))
+                        {
+                            <div class="col">
+                                <a asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-info"></i></a>
+                            </div>
+                            <div class="col">
+                                <a asp-action="Delete" asp-route-id="@item.Id"><i class="far fa-trash-alt"></i></a>
+                            </div>
+                            <div class="col">
+                                <a asp-action="Edit" asp-route-id="@item.Id"><i class="far fa-edit"></i></a>
+                            </div>
+                            <div class="col">
 
-                                <em>Subscribed</em>
 
-                            }
-                            else
-                            {
-                                
-                                <form asp-action="Subscribe">
-                                    <input name="documentID" value="@item.Id" hidden />
-                                    <input name="userID" value="@ViewData["UserID"]" hidden />
-                                    <button class="btn btn-sm btn-outline-light" type="submit">Subscribe</button>
-                                </form>
-                            }
+                                @if (item.Subscriptions.Count(item => item.ApplicationUserID == (string)(ViewData["UserID"])) > 0)
+                                {
+
+                                    <em>Subscribed</em>
+
+                                }
+                                else
+                                {
+
+                                    <form asp-action="Subscribe">
+                                        <input name="documentID" value="@item.Id" hidden />
+                                        <input name="userID" value="@ViewData["UserID"]" hidden />
+                                        <button class="btn btn-sm btn-outline-light" type="submit">Subscribe</button>
+                                    </form>
+                                }
 
                             </div>
+                        }
                     </div>
 
 
