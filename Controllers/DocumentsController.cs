@@ -272,11 +272,11 @@ namespace OrgDocs.Controllers
                 }
 
 
-                
 
-               
 
-              
+                List<Subscription> listofSubscriptions = _context.Subscriptions.Include(s => s.ApplicationUser).Where(d => d.DocumentID == id).ToList();
+                var callbackUrl = Url.Action(nameof(Index), "Documents", null, Request.Scheme);
+
                 try
                 {
                     
@@ -285,11 +285,12 @@ namespace OrgDocs.Controllers
                     //send email update post-document update to subscribed users.
                     if (uploadedNewFile)
                     {
-                        List<Subscription> listofSubscriptions = _context.Subscriptions.Include(s => s.ApplicationUser).Where(d => d.DocumentID == id).ToList();
+                        
                         foreach (Subscription sub in listofSubscriptions)
                         {
                             await _emailSender.SendEmailAsync(sub.ApplicationUser.Email, "OrgDocs: Subscribed document updated!",
-                                $"This notification is to inform you that the document titled {document.Title} has been updated");
+                                $"This notification is to inform you that the document titled {document.Title} has been updated. Please" +
+                                $" click <a href=\"" + callbackUrl + "\">here</a> to view");
                         }
                     }
 
