@@ -108,24 +108,25 @@
                             </div>
                             <div class="col">
 
+                                <form asp-action="Subscribe">
+                                    <input name="documentID" value="@item.Id" hidden />
+                                    <input name="userID" value="@ViewData["UserID"]" hidden />
+                                    @if (item.Subscriptions.Count(item => item.ApplicationUserID == (string)(ViewData["UserID"])) > 0)
+                                    {
 
-                                @if (item.Subscriptions.Count(item => item.ApplicationUserID == (string)(ViewData["UserID"])) > 0)
-                                {
+                                        <button style="width:91.6px" class="btn btn-sm btn-outline-danger btn-sub" type="submit">Unsubscribe</button>
 
-                                    <em>Subscribed</em>
+                                    }
+                                    else
+                                    {
 
-                                }
-                                else
-                                {
 
-                                    <form asp-action="Subscribe">
-                                        <input name="documentID" value="@item.Id" hidden />
-                                        <input name="userID" value="@ViewData["UserID"]" hidden />
-                                        <button class="btn btn-sm btn-outline-light" type="submit">Subscribe</button>
-                                    </form>
-                                }
 
-                            </div>
+                                        <button style="width:91.6px" class="btn btn-sm btn-outline-light btn-sub" type="submit">Subscribe</button>
+
+                                    }
+                                </form>
+                                </div>
                         }
                     </div>
 

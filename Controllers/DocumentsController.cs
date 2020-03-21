@@ -366,13 +366,26 @@ namespace OrgDocs.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Subscribe(int documentID, string userID)
         {
-            Subscription subscription = new Subscription
-            {
-                DocumentID = documentID,
-                ApplicationUserID = userID
-            };
 
-            _context.Subscriptions.Add(subscription);
+            Subscription subscription = _context.Subscriptions
+                .Where(s => s.DocumentID == documentID & s.ApplicationUserID == userID).FirstOrDefault();
+
+            if (subscription == null)
+            {
+                subscription = new Subscription
+                {
+                    DocumentID = documentID,
+                    ApplicationUserID = userID
+                };
+                _context.Subscriptions.Add(subscription);
+            }
+            else
+            {
+                _context.Subscriptions.Remove(subscription);
+            }
+               
+
+            
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -380,6 +393,11 @@ namespace OrgDocs.Controllers
         private bool DocumentExists(int id)
         {
             return _context.Documents.Any(e => e.Id == id);
+        }
+
+        private bool SubscriptionExists(int documentID, string userID)
+        {
+            return _context.Subscriptions.Any(e => e.DocumentID == documentID & e.ApplicationUserID == userID);
         }
     }
 }
