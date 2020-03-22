@@ -33,6 +33,8 @@
                 <input type="file" name="files" id="uploadBox" multiple class="form-control" />
                 <input type="hidden" asp-for="PdfUrl" />
                 <span asp-validation-for="PdfUrl" class="text-danger"></span>
+           
+     
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -46,5 +48,6 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -237,7 +237,8 @@ namespace OrgDocs.Controllers
                 return NotFound();
             }
 
-           
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", document.CategoryId);
+            ViewData["DeptId"] = new SelectList(_context.Depts, "Id", "Department", document.DeptId);
 
             if (ModelState.IsValid)
             {
@@ -254,6 +255,8 @@ namespace OrgDocs.Controllers
                     var pdfPath = Path.Combine(webRootPath, document.PdfUrl.TrimStart('\\'));
                     if (extension != ".pdf")  //not processing request if it is not a pdf
                     {
+
+                        ModelState.AddModelError(string.Empty, "Error: this filetype is not allowed");
                         return View(document);
                     }
 
@@ -313,8 +316,7 @@ namespace OrgDocs.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", document.CategoryId);
-            ViewData["DeptId"] = new SelectList(_context.Depts, "Id", "Department", document.DeptId);
+
             return View(document);
         }
 
