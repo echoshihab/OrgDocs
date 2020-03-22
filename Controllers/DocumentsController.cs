@@ -182,8 +182,17 @@ namespace OrgDocs.Controllers
                     string fileName = Guid.NewGuid().ToString();
                     var uploads = Path.Combine(webRootPath, @"documents\uploads");
                     var extension = Path.GetExtension(files[0].FileName);
+                    long size = files[0].Length;
+
                     if (extension != ".pdf")  //not processing request if it is not a pdf
                     {
+                        ModelState.AddModelError(string.Empty, "Error: this filetype is not allowed");
+                        return View(document);
+                    }
+
+                    if (size > 2000000)  //not processing request if size is bigger than 2mb
+                    {
+                        ModelState.AddModelError(string.Empty, "Error: File size larger than 2 MB");
                         return View(document);
                     }
 
@@ -224,9 +233,7 @@ namespace OrgDocs.Controllers
             return View(document);
         }
 
-        // POST: Documents/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -245,6 +252,7 @@ namespace OrgDocs.Controllers
                 string webRootPath = _hostEnvironment.WebRootPath;
                 var files = HttpContext.Request.Form.Files;
                 bool uploadedNewFile = false;
+                long size = files[0].Length;
 
                 if (files.Count > 0) //a new file has been uploded in edit
                 {
@@ -253,10 +261,17 @@ namespace OrgDocs.Controllers
                     var uploads = Path.Combine(webRootPath, @"documents\uploads");
                     var extension = Path.GetExtension(files[0].FileName);
                     var pdfPath = Path.Combine(webRootPath, document.PdfUrl.TrimStart('\\'));
+
                     if (extension != ".pdf")  //not processing request if it is not a pdf
                     {
 
                         ModelState.AddModelError(string.Empty, "Error: this filetype is not allowed");
+                        return View(document);
+                    }
+
+                    if (size > 2000000)  //not processing request if size is bigger than 2mb
+                    {
+                        ModelState.AddModelError(string.Empty, "Error: File size larger than 2 MB");
                         return View(document);
                     }
 
